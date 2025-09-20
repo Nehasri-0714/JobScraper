@@ -4,31 +4,17 @@ import puppeteer from "puppeteer";
 
 async function scrapeJobs() {
   try {
-    // Ensure output directory exists
     const outputDir = path.resolve(process.cwd(), "dist");
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-    // Launch Puppeteer using system Chromium (stable in GitHub Actions)
     const browser = await puppeteer.launch({
       headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--disable-gpu",
-        "--window-size=1920,1080",
-      ],
-      executablePath: "/usr/bin/chromium-browser", // system Chromium
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
     });
 
     const page = await browser.newPage();
 
-    await page.goto("https://remoteok.io/remote-dev-jobs", {
-      waitUntil: "networkidle2",
-    });
+    await page.goto("https://remoteok.io/remote-dev-jobs", { waitUntil: "networkidle2" });
 
     const jobs = await page.evaluate(() => {
       const jobRows = Array.from(document.querySelectorAll("tr.job"));
@@ -51,3 +37,4 @@ async function scrapeJobs() {
 }
 
 scrapeJobs();
+
