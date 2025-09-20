@@ -2,22 +2,21 @@ name: Run Job Scraper
 
 on:
   schedule:
-    # Runs every day at 12:00 AM UTC (adjust later for IST if needed)
-    - cron: "0 0 * * *"
-  workflow_dispatch:  # lets you trigger manually from GitHub UI
+    - cron: "0 0 * * *" # runs every day at 12 AM UTC
+  workflow_dispatch: # allows manual trigger
 
 jobs:
-  scrape:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
@@ -25,7 +24,7 @@ jobs:
       - name: Run scraper
         run: npx ts-node scraper.ts
 
-      - name: Upload jobs.json artifact
+      - name: Upload results
         uses: actions/upload-artifact@v3
         with:
           name: jobs
