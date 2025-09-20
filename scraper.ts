@@ -10,9 +10,13 @@ async function scrapeJobs() {
 
     puppeteerExtra.use(StealthPlugin());
 
-    const browser: any = await puppeteerExtra.launch({ headless: true });
-    const page: any = await browser.newPage();
+    // Launch Chrome with sandbox disabled (needed for GitHub Actions)
+    const browser: any = await puppeteerExtra.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
 
+    const page: any = await browser.newPage();
     await page.goto("https://remoteok.io/remote-dev-jobs", { waitUntil: "networkidle2" });
 
     const jobs: any[] = await page.evaluate(() => {
@@ -25,12 +29,10 @@ async function scrapeJobs() {
       }));
     });
 
-    // Save jobs.json in repo root
     const outputPath = path.resolve(process.cwd(), "jobs.json");
     fs.writeFileSync(outputPath, JSON.stringify(jobs, null, 2));
 
     console.log(`✅ Scraping finished. Jobs saved to ${outputPath}`);
-
     await browser.close();
   } catch (err) {
     console.error("❌ Error during scraping:", err);
