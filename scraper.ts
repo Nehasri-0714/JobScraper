@@ -4,11 +4,13 @@ import path from "path";
 
 async function scrapeJobs() {
   try {
+    // Puppeteer-extra and Stealth plugin
     const puppeteerExtra: any = (await import("puppeteer-extra")).default;
     const StealthPlugin: any = (await import("puppeteer-extra-plugin-stealth")).default;
 
     puppeteerExtra.use(StealthPlugin());
 
+    // Launch browser with sandbox flags for CI
     const browser: any = await puppeteerExtra.launch({
       headless: true,
       args: [
@@ -19,6 +21,7 @@ async function scrapeJobs() {
         "--single-process",
         "--no-zygote",
       ],
+      defaultViewport: null,
     });
 
     const page: any = await browser.newPage();
@@ -31,14 +34,14 @@ async function scrapeJobs() {
       const jobRows = Array.from(document.querySelectorAll("tr.job"));
       return jobRows.map((job) => ({
         title: job.querySelector("h2")?.textContent?.trim() || "",
-        company:
-          job.querySelector(".companyLink span")?.textContent?.trim() || "",
+        company: job.querySelector(".companyLink span")?.textContent?.trim() || "",
         location: job.querySelector(".location")?.textContent?.trim() || "Remote",
         datePosted: job.querySelector("time")?.getAttribute("datetime") || "",
       }));
     });
 
-    const outputPath = path.resolve(process.cwd(), "jobs.json");
+    // Save jobs.json inside dist folder
+    const outputPath = path.resolve(process.cwd(), "dist", "jobs.json");
     fs.writeFileSync(outputPath, JSON.stringify(jobs, null, 2));
 
     console.log(`✅ Scraping finished. Jobs saved to ${outputPath}`);
