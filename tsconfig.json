@@ -7,9 +7,7 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "moduleResolution": "NodeNext",
-    "resolveJsonModule": true
+    "skipLibCheck": true
   },
   "include": ["scraper.ts"]
 }
