@@ -4,13 +4,13 @@ import puppeteer from "puppeteer";
 
 async function scrapeJobs() {
   try {
-    // Ensure the output directory exists
+    // Ensure output directory exists
     const outputDir = path.resolve(process.cwd(), "dist");
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // Launch Puppeteer with flags for CI/Linux environments
+    // Launch Puppeteer using system Chromium (stable in GitHub Actions)
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -21,7 +21,7 @@ async function scrapeJobs() {
         "--disable-gpu",
         "--window-size=1920,1080",
       ],
-      executablePath: process.env.CHROME_PATH || undefined, // optional system Chromium
+      executablePath: "/usr/bin/chromium-browser", // system Chromium
     });
 
     const page = await browser.newPage();
