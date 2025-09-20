@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript output
+dist/
+*.tsbuildinfo
+
+# VS Code settings
+.vscode/
+
+# Environment variables
+.env
+
+# Optional: artifacts from GitHub Actions (if you want to keep them local)
+jobs.json
