@@ -1,44 +1,34 @@
-// scraper.ts
-// Make sure your package.json has: "type": "module"
-
 import fs from "fs";
 
-// Force TS to stop complaining about missing types
-const puppeteer: any = (await import("puppeteer-extra")).default;
-const StealthPlugin: any = (await import("puppeteer-extra-plugin-stealth")).default;
+// Use "any" to avoid TS type errors
+const puppeteerExtra: any = await import("puppeteer-extra").then(m => m.default);
+const StealthPlugin: any = await import("puppeteer-extra-plugin-stealth").then(m => m.default);
 
 // Add stealth plugin
-puppeteer.use(StealthPlugin());
+puppeteerExtra.use(StealthPlugin());
 
 async function scrapeJobs() {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    const browser: any = await puppeteerExtra.launch({ headless: true });
+    const page: any = await browser.newPage();
 
-    // Go to RemoteOK's job listings page
+    // Navigate to RemoteOK job listings
     await page.goto("https://remoteok.io/remote-dev-jobs", {
       waitUntil: "networkidle2",
     });
 
     // Extract job data
-    const jobs = await page.evaluate(() => {
-      const jobRows = Array.from(document.querySelectorAll("tr.job")); // Each job row
-      return jobRows.map((job) => {
-        const title =
-          job.querySelector("h2")?.textContent?.trim() || "";
-        const company =
-          job.querySelector(".companyLink span")?.textContent?.trim() || "";
-        const location =
-          job.querySelector(".location")?.textContent?.trim() || "Remote";
-        const datePosted =
-          job.querySelector("time")?.getAttribute("datetime") || "";
-        return { title, company, location, datePosted };
-      });
+    const jobs: any[] = await page.evaluate(() => {
+      const jobRows = Array.from(document.querySelectorAll("tr.job"));
+      return jobRows.map(job => ({
+        title: job.querySelector("h2")?.textContent?.trim() || "",
+        company: job.querySelector(".companyLink span")?.textContent?.trim() || "",
+        location: job.querySelector(".location")?.textContent?.trim() || "Remote",
+        datePosted: job.querySelector("time")?.getAttribute("datetime") || ""
+      }));
     });
 
-    console.log(jobs);
-
-    // Save jobs to JSON file
+    // Save jobs to JSON
     fs.writeFileSync("jobs.json", JSON.stringify(jobs, null, 2));
 
     await browser.close();
@@ -48,5 +38,4 @@ async function scrapeJobs() {
   }
 }
 
-// Run the scraper
 scrapeJobs();

@@ -3,18 +3,21 @@
   "version": "1.0.0",
   "description": "first job scraper",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/scraper.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/scraper.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^24.5.2",
     "puppeteer": "^24.22.0",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "@types/node": "^24.5.2"
   }
 }
