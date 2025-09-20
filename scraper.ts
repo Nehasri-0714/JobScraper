@@ -1,23 +1,20 @@
+// scraper.ts
 import fs from "fs";
-
-// Use "any" to avoid TS type errors
-const puppeteerExtra: any = await import("puppeteer-extra").then(m => m.default);
-const StealthPlugin: any = await import("puppeteer-extra-plugin-stealth").then(m => m.default);
-
-// Add stealth plugin
-puppeteerExtra.use(StealthPlugin());
+import path from "path";
 
 async function scrapeJobs() {
   try {
+    // Treat puppeteer-extra as "any" to avoid TS errors
+    const puppeteerExtra: any = (await import("puppeteer-extra")).default;
+    const StealthPlugin: any = (await import("puppeteer-extra-plugin-stealth")).default;
+
+    puppeteerExtra.use(StealthPlugin());
+
     const browser: any = await puppeteerExtra.launch({ headless: true });
     const page: any = await browser.newPage();
 
-    // Navigate to RemoteOK job listings
-    await page.goto("https://remoteok.io/remote-dev-jobs", {
-      waitUntil: "networkidle2",
-    });
+    await page.goto("https://remoteok.io/remote-dev-jobs", { waitUntil: "networkidle2" });
 
-    // Extract job data
     const jobs: any[] = await page.evaluate(() => {
       const jobRows = Array.from(document.querySelectorAll("tr.job"));
       return jobRows.map(job => ({
@@ -28,11 +25,13 @@ async function scrapeJobs() {
       }));
     });
 
-    // Save jobs to JSON
-    fs.writeFileSync("jobs.json", JSON.stringify(jobs, null, 2));
+    // Save jobs.json in repo root
+    const outputPath = path.resolve(process.cwd(), "jobs.json");
+    fs.writeFileSync(outputPath, JSON.stringify(jobs, null, 2));
+
+    console.log(`✅ Scraping finished. Jobs saved to ${outputPath}`);
 
     await browser.close();
-    console.log("✅ Scraping finished. Jobs saved to jobs.json");
   } catch (err) {
     console.error("❌ Error during scraping:", err);
   }
