@@ -20,5 +20,7 @@ dist/
 # Environment variables
 .env
 
+.idea
+
 # Optional: artifacts from GitHub Actions (if you want to keep them local)
 jobs.json
